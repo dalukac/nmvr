@@ -1,7 +1,10 @@
+from tkinter import YView
 import matplotlib
 import matplotlib.pyplot as plt
 import csv
 import numpy as np
+from numpy.core.defchararray import split
+from numpy.core.fromnumeric import size
 from numpy.lib.npyio import genfromtxt
 import pandas as pd
 import PySimpleGUI as sg
@@ -24,11 +27,28 @@ file = "map.csv"
 data = genfromtxt("map.csv", delimiter=",")
 matplotlib.use("TkAgg")
 
+def find_robot():
+    result = np.where(data == 2)
+    x=result[0]
+    y=result[1]
+    return [x,y]
+
+def clearMap():
+    for i in range(len(data)):
+        for j in range(len(data)):
+            if data[i][j] == 2:
+                data[i][j]=0
+
 def changeRobotPos(X,Y):
+    lastX = find_robot()[0]
+    lastY = find_robot()[1]
+    clearMap()
     valueX = int(X)
     valueY = int(Y)
-    print(valueX,valueY)
-    data[valueX,valueY] = 2
+    if data[valueX,valueY] == 1:
+        data[lastX,lastY] = 2
+        print("cell occupied")
+    else: data[valueX,valueY] = 2
     
 def fig_maker(data):
     fig, ax = plt.subplots()
@@ -55,8 +75,9 @@ sg.theme('black')
 
 layout = [
     [sg.Text('robot_map')],
-    [sg.Button('create robot',size=(10,1))],
-    [sg.Input(key='XINPUT',size=(10,1))],[sg.Input(key='YINPUT',size=(10,1))],
+    [sg.Button('spawn robot',size=(10,1))],
+    [sg.Text('X pos:'), sg.Input(key='XINPUT',size=(10,1)), sg.Text('Y pos:'),sg.Input(key='YINPUT',size=(10,1))],
+    [sg.Button('U',size=(5,1)), sg.Button('D',size=(5,1)), sg.Button('L',size=(5,1)),sg.Button('R',size=(5,1))],
     [sg.Canvas(key='test_env')]
    
     ]
@@ -77,12 +98,16 @@ window = sg.Window(
 
 
 fig_agg = None
+if fig_agg is not None:
+            delete_fig_agg(fig_agg)
+fig = fig_maker(data)
+fig_agg = draw_figure(window['test_env'].TKCanvas,fig)
 
 while True:
     event, values = window.read()
     if event in (sg.WIN_CLOSED, 'Cancel'):
         break
-    if event == 'create robot':
+    if event == 'spawn robot':
         Xvalue = values['XINPUT']
         Yvalue = values['YINPUT']
         changeRobotPos(Xvalue,Yvalue)
@@ -90,8 +115,30 @@ while True:
             delete_fig_agg(fig_agg)
         fig = fig_maker(data)
         fig_agg = draw_figure(window['test_env'].TKCanvas,fig)
-        window.refresh()
-
+    if event == 'U':
+        changeRobotPos(find_robot()[0]-1,find_robot()[1])
+        if fig_agg is not None:
+            delete_fig_agg(fig_agg)
+        fig = fig_maker(data)
+        fig_agg = draw_figure(window['test_env'].TKCanvas,fig)
+    if event == 'D':
+        changeRobotPos(find_robot()[0]+1,find_robot()[1])
+        if fig_agg is not None:
+            delete_fig_agg(fig_agg)
+        fig = fig_maker(data)
+        fig_agg = draw_figure(window['test_env'].TKCanvas,fig)
+    if event == 'L':
+        changeRobotPos(find_robot()[0],find_robot()[1]-1)
+        if fig_agg is not None:
+            delete_fig_agg(fig_agg)
+        fig = fig_maker(data)
+        fig_agg = draw_figure(window['test_env'].TKCanvas,fig)
+    if event == 'R':
+        changeRobotPos(find_robot()[0],find_robot()[1]+1)
+        if fig_agg is not None:
+            delete_fig_agg(fig_agg)
+        fig = fig_maker(data)
+        fig_agg = draw_figure(window['test_env'].TKCanvas,fig)
 
 window.close()
 
