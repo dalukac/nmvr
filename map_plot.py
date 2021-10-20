@@ -1,5 +1,5 @@
 from tkinter import YView
-import matplotlib
+import matplotlib, time, threading
 import matplotlib.pyplot as plt
 import csv
 import numpy as np
@@ -11,7 +11,7 @@ import PySimpleGUI as sg
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib import colors
 
-_VARS = {'window': False,'fig_agg':False,'pltFig':False}
+
 
 EMPTY_CELL = 0
 OBSTACLE_CELL = 1
@@ -35,7 +35,7 @@ def find_robot():
 
 def clearMap():
     for i in range(len(data)):
-        for j in range(len(data)):
+        for j in range(len(data[i])):
             if data[i][j] == 2:
                 data[i][j]=0
 
@@ -48,7 +48,9 @@ def changeRobotPos(X,Y):
     if data[valueX,valueY] == 1:
         data[lastX,lastY] = 2
         print("cell occupied")
-    else: data[valueX,valueY] = 2
+    else: 
+        data[valueX,valueY] = 2
+        print("robot moved to pos: ", valueX,valueY)
     
 def fig_maker(data):
     fig, ax = plt.subplots()
@@ -87,15 +89,13 @@ window = sg.Window(
     'matplotlib Test',
     layout,
     resizable = True,
-    size=(500,500),
+    size=(800,600),
     auto_size_buttons=False,
     location=(100,100),
     finalize=True,
     element_justification='center',
     font="Verdana 18",
 )
-
-
 
 fig_agg = None
 if fig_agg is not None:
@@ -110,6 +110,10 @@ while True:
     if event == 'spawn robot':
         Xvalue = values['XINPUT']
         Yvalue = values['YINPUT']
+        if bool(Xvalue) or bool(Yvalue) == False:
+            Xvalue = 1
+            Yvalue = 1
+
         changeRobotPos(Xvalue,Yvalue)
         if fig_agg is not None:
             delete_fig_agg(fig_agg)
@@ -139,6 +143,7 @@ while True:
             delete_fig_agg(fig_agg)
         fig = fig_maker(data)
         fig_agg = draw_figure(window['test_env'].TKCanvas,fig)
+   
 
 window.close()
 
