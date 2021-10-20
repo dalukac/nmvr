@@ -22,8 +22,7 @@ cmap= colors.ListedColormap(['purple','yellow','green','cyan'])
 bounds = [EMPTY_CELL,OBSTACLE_CELL,ROBOT_CELL,GOAL_CELL]
 norm = colors.BoundaryNorm(bounds,cmap.N)
 
-
-
+#load map
 file = "map.csv"
 data = genfromtxt("map.csv", delimiter=",")
 matplotlib.use("TkAgg")
@@ -73,6 +72,7 @@ def changeRobotPos(X,Y):
         data[valueX,valueY] = 2
         print("robot moved to pos: ", valueX,valueY)
     
+#func to plot map
 def fig_maker(data):
     fig, ax = plt.subplots()
     ax.imshow(data,cmap=cmap,norm=norm)
@@ -84,16 +84,19 @@ def fig_maker(data):
     fig.set_size_inches((8.5,11),forward='False')
     return fig
 
+#helper func for pysimplegui to plot 
 def draw_figure(canvas, figure):
     figure_canvas_agg = FigureCanvasTkAgg(figure, canvas)
     figure_canvas_agg.draw()
     figure_canvas_agg.get_tk_widget().pack(side='top', fill='both',expand=1)
     return figure_canvas_agg
 
+#delete existing figure
 def delete_fig_agg(fig_agg):
     fig_agg.get_tk_widget().forget()
     plt.close('all')
     
+#gui layout
 
 sg.theme('black')
 
@@ -102,9 +105,7 @@ layout = [
     [sg.Button('spawn robot',size=(10,1)),sg.Button('Create',size=(10,1)),sg.Button('Remove',size=(10,1))],
     [sg.Text('X pos:'), sg.Input(key='XINPUT',size=(10,1)), sg.Text('Y pos:'),sg.Input(key='YINPUT',size=(10,1))],
     [sg.Button('U',size=(5,1)), sg.Button('D',size=(5,1)), sg.Button('L',size=(5,1)),sg.Button('R',size=(5,1))],
-    [sg.Canvas(key='test_env')]
-   
-    ]
+    [sg.Canvas(key='test_env')] ]
 
 
 window = sg.Window(
@@ -119,12 +120,14 @@ window = sg.Window(
     font="Verdana 18",
 )
 
+#first time plot
 fig_agg = None
 if fig_agg is not None:
             delete_fig_agg(fig_agg)
 fig = fig_maker(data)
 fig_agg = draw_figure(window['test_env'].TKCanvas,fig)
 
+#event listened
 while True:
     event, values = window.read()
     if event in (sg.WIN_CLOSED, 'Cancel'):
