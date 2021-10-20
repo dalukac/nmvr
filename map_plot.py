@@ -33,7 +33,8 @@ sg.theme('black')
 
 layout = [
     [sg.Text('robot_map')],
-     [sg.Button('ok',size=(12,1))],
+    [sg.Button('ok',size=(5,1))],
+    [sg.Input(key='-INPUT-')],
     [sg.Canvas(key='test_env')]
    
     ]
