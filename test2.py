@@ -26,6 +26,14 @@ def get_avel():
     global ang_vel
     return ang_vel
 
+def set_dist(dist):
+    global distance
+    distance = dist
+
+def get_dist():
+    global distance
+    return distance
+
 #cell definition and color assign
 EMPTY_CELL = 0
 OBSTACLE_CELL = 1
@@ -66,25 +74,6 @@ def wipeMap():
             if data[i][j] == 2 or data[i][j] == 4 or data[i][j] == 3:
                 data[i][j]=0
 
-def createObstacle(X,Y):
-    valueX = int(X)
-    valueY = int(Y)
-    if data[valueX,valueY] == 2:
-        data[X,Y] = 2
-        print("cell occupied")
-    else: 
-        data[valueX,valueY] = 1
-        print("obstacle created at: ", valueX,valueY)
-
-def removeObstacle(X,Y):
-    valueX = int(X)
-    valueY = int(Y)
-    if data[valueX,valueY] == 2:
-        data[X,Y] = 2
-        print("cell occupied")
-    else: 
-        data[valueX,valueY] = 0
-        print("obstacle removed at: ", valueX,valueY)
 
 def changeRobotPos(X,Y):
     lastX = find_robot()[0]
@@ -137,6 +126,7 @@ def euclid_dist():
     #dist = sqrt(pow((find_goal()[0] - find_robot()[0]), 2) + pow((find_goal()[1] - find_robot()[1]), 2))
     
     city = cityblock( [find_goal()[0], find_goal()[1]], [find_robot()[0], find_robot()[1]])
+    set_dist(city)
     text = city
     window['-G-'].Update(text)
     if city <= 2:
@@ -147,12 +137,7 @@ def euclid_dist():
         return 1
     else:
         return .5
-        '''
-    text = dist
-    window['-G-'].Update(text)
-    print("distance", dist, "robot: ",find_robot()[0],find_robot()[1],"goal:",find_goal()[0],find_goal()[1])
-    return dist
-    '''
+
 
 
 def linear_vel(constant=1.5):
@@ -166,56 +151,40 @@ def linear_vel(constant=1.5):
 
 def steerAng():
     steerX, steerY = 0, 0
-
-    if find_goal()[0] < find_robot()[0] and find_goal()[1] < find_robot()[1]:
+    angle_to_check = steering_angle()
+    if angle_to_check > 202.5 and angle_to_check <=247.5 or angle_to_check == 225:
         steerX = -1
         steerY = -1
-        text = "45°"
-        tang_vel = 45
-    elif find_goal()[0] > find_robot()[0] and find_goal()[1] < find_robot()[1]:
+    elif angle_to_check <= 337.5 and angle_to_check > 292.5 or angle_to_check == 315:
         steerX = 1
         steerY = -1
-        text = "135°"
-        tang_vel = 135
-    elif find_goal()[0] < find_robot()[0] and find_goal()[1] > find_robot()[1]:
+    elif angle_to_check >112.5 and angle_to_check <157.5 or angle_to_check == 135:
         steerX = -1
         steerY = 1
-        text = "315°"
-        tang_vel = 315
-    elif find_goal()[0] > find_robot()[0] and find_goal()[1] > find_robot()[1]:
+    elif angle_to_check < 67.5 and angle_to_check >= 22.5 or angle_to_check == 45: 
         steerX = 1
         steerY = 1
-        text = "225°"
-        tang_vel = 225
-    elif find_goal()[0] < find_robot()[0] and find_goal()[1] == find_robot()[1]:
+    elif angle_to_check < 157.5 and angle_to_check < 202.5: 
         steerX = -1
         steerY = 0
-        text = "0°"
-        tang_vel = 0
-    elif find_goal()[0] > find_robot()[0] and find_goal()[1] == find_robot()[1]:
+    elif angle_to_check <22.5 and angle_to_check >=0 or angle_to_check<=360 and angle_to_check>337.5:
         steerX = 1
         steerY = 0
-        text = "180°"
-        tang_vel = 180
-    elif find_goal()[0] == find_robot()[0] and find_goal()[1] < find_robot()[1]:
+    elif angle_to_check <292.5 and angle_to_check>247.5:
         steerX = 0
         steerY = -1
-        text = "90°"
-        tang_vel = 90
-    elif find_goal()[0] == find_robot()[0] and find_goal()[1] > find_robot()[1]:
+    elif angle_to_check > 67.5 and angle_to_check < 112.5 :
         steerX = 0
         steerY = 1
-        text = "270°"
-        tang_vel = 270
-    window['-A-'].Update(text)
-    #tang_vel = tang_vel - angles[ steerY - 20]
-    if tang_vel >= 360:
-        tang_vel -= 360
-
-    set_avel(tang_vel)
     return steerX, steerY
 
-
+def steering_angle():
+    ang =  atan2(find_goal()[1] - find_robot()[1], find_goal()[0] - find_robot()[0])
+    angle = round((ang * 180)/pi)
+    if angle<0:
+        angle +=360
+    window['-A-'].Update(angle)
+    return angle
 
 #func to plot map
 def fig_maker(data):
@@ -249,10 +218,9 @@ def delete_fig_agg(fig_agg):
 sg.theme('black')
 
 
-col1 = [[sg.Button('spawn robot',size=(10,1)),sg.Button('Create',size=(10,1)),sg.Button('Remove',size=(10,1)), sg.Button('clear',size = (10,1)),sg.Button('G2G',size=(10,1))],
+col1 = [[sg.Button('spawn robot',size=(10,1)),sg.Button('clear',size = (10,1)),sg.Button('G2G',size=(10,1))],
     [sg.Text('X pos:'), sg.Input(key='XINPUT',size=(10,1)), sg.Text('Y pos:'),sg.Input(key='YINPUT',size=(10,1))],
     [sg.Button('U',size=(5,1)), sg.Button('D',size=(5,1)), sg.Button('L',size=(5,1)),sg.Button('R',size=(5,1))],
-    [sg.Button('UL',size=(5,1)), sg.Button('UR',size=(5,1)), sg.Button('DL',size=(5,1)),sg.Button('DR',size=(5,1))],
     [sg.Button('Set goal',size = (10,1)), sg.Button('remove goal',size = (10,1))],
     [sg.Text("Robot Pos:", justification='c', font='Mambo 20'),sg.Text("X Y", justification='c', font='Mambo 20', key='-R-')],
     [sg.Text("Distance goal:", justification='c', font='Mambo 20'),sg.Text("dist", justification='c', font='Mambo 20', key='-G-')],
@@ -330,9 +298,10 @@ while True:
         while find_goal()[0] != find_robot()[0] or find_goal()[1] != find_robot()[1]:
             
             goX, goY = steerAng()
-            Preg = euclid_dist() * get_avel()
+            print(steering_angle())
+            Preg = euclid_dist() * steering_angle()
             changeRobotPos(find_robot()[0]+ goX, find_robot()[1] + goY)
-            text = Preg
+            text = 2-Preg
             window['-AV-'].Update(text)
             if fig_agg is not None:
                 delete_fig_agg(fig_agg)
@@ -347,7 +316,8 @@ while True:
         changeRobotPos(find_robot()[0]-1,find_robot()[1])    
         euclid_dist()
         linear_vel()
-        steerAng()    
+        steerAng() 
+        print(steering_angle())
         if fig_agg is not None:
             delete_fig_agg(fig_agg)
         fig = fig_maker(data)
@@ -360,6 +330,7 @@ while True:
         euclid_dist()
         linear_vel()
         steerAng()
+        print(steering_angle())
         if fig_agg is not None:
             delete_fig_agg(fig_agg)
         fig = fig_maker(data)
@@ -370,6 +341,7 @@ while True:
         euclid_dist()
         linear_vel()
         steerAng()
+        print(steering_angle())
         if fig_agg is not None:
             delete_fig_agg(fig_agg)
         fig = fig_maker(data)
@@ -380,68 +352,7 @@ while True:
         euclid_dist()
         linear_vel()
         steerAng()
-        if fig_agg is not None:
-            delete_fig_agg(fig_agg)
-        fig = fig_maker(data)
-        fig_agg = draw_figure(window['test_env'].TKCanvas,fig)
-
-#Diagonal movement
-#==================================
-    if event == 'UL':
-        changeRobotPos(find_robot()[0]-1,find_robot()[1]-1)    
-        euclid_dist()
-        linear_vel()
-        steerAng()    
-        if fig_agg is not None:
-            delete_fig_agg(fig_agg)
-        fig = fig_maker(data)
-        fig_agg = draw_figure(window['test_env'].TKCanvas,fig)
-
-    if event == 'UR':
-        Xvalue = values['XINPUT']
-        Yvalue = values['YINPUT']
-        changeRobotPos(find_robot()[0]-1,find_robot()[1]+1)
-        euclid_dist()
-        linear_vel()
-        steerAng()
-        if fig_agg is not None:
-            delete_fig_agg(fig_agg)
-        fig = fig_maker(data)
-        fig_agg = draw_figure(window['test_env'].TKCanvas,fig)
-
-    if event == 'DL':
-        changeRobotPos(find_robot()[0]+1,find_robot()[1]-1)
-        euclid_dist()
-        linear_vel()
-        steerAng()
-        if fig_agg is not None:
-            delete_fig_agg(fig_agg)
-        fig = fig_maker(data)
-        fig_agg = draw_figure(window['test_env'].TKCanvas,fig)
-
-    if event == 'DR':
-        changeRobotPos(find_robot()[0]+1,find_robot()[1]+1)
-        euclid_dist()
-        linear_vel()
-        steerAng()
-        if fig_agg is not None:
-            delete_fig_agg(fig_agg)
-        fig = fig_maker(data)
-        fig_agg = draw_figure(window['test_env'].TKCanvas,fig)
-
-    if event == 'Create':
-        Xvalue = values['XINPUT']
-        Yvalue = values['YINPUT']
-        createObstacle(Xvalue,Yvalue)
-        if fig_agg is not None:
-            delete_fig_agg(fig_agg)
-        fig = fig_maker(data)
-        fig_agg = draw_figure(window['test_env'].TKCanvas,fig)
-
-    if event == 'Remove':
-        Xvalue = values['XINPUT']
-        Yvalue = values['YINPUT']
-        removeObstacle(Xvalue,Yvalue)
+        print(steering_angle())
         if fig_agg is not None:
             delete_fig_agg(fig_agg)
         fig = fig_maker(data)

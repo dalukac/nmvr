@@ -7,18 +7,20 @@ import os
 import numpy as np
 from numpy.lib.npyio import genfromtxt
 
-def receiveData(map_data):
-    np.savetxt('subscriber.csv',map_data,delimiter=',',fmt='%s')
 
 class MinimalSubscriber(Node):
     def __init__(self):
         super().__init__('minimal_subscriber')
-        self.subscription = self.create_subscription(String, 'topic', self.listener_callback,5)
+        self.subscription = self.create_subscription(String, 'map', self.listener_callback,100)
         self.subscription
 
     def listener_callback(self,msg):
-        receiveData(eval(msg.data))
-        self.get_logger().info('map received')
+        self.get_logger().info('I heard: "%s"' % msg.data)
+        grid=msg.data
+        with open('/home/nmvr/nmvr/nmvr/map.csv', 'w', newline='') as csvfile:
+            spamwriter = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+            for pos in grid:
+                spamwriter.writerow(str(pos))
 
 def main(args=None):
     rclpy.init(args=args)
