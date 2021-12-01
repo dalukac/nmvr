@@ -1,4 +1,3 @@
-import os
 import time
 import math
 import matplotlib
@@ -222,11 +221,7 @@ def delete_fig_agg(fig_agg):
 sg.theme('black')
 
 
-col1 = [[sg.Button('spawn robot',size=(10,1)),sg.Button('clear',size = (10,1)),sg.Button('G2G',size=(10,1))],
-    [sg.Text('X pos:'), sg.Input(key='XINPUT',size=(10,1)), sg.Text('Y pos:'),sg.Input(key='YINPUT',size=(10,1))],
-    [sg.Button('U',size=(5,1)), sg.Button('D',size=(5,1)), sg.Button('L',size=(5,1)),sg.Button('R',size=(5,1))],
-    [sg.Button('Set goal',size = (10,1)), sg.Button('remove goal',size = (10,1))],
-    [sg.Text("Robot Pos:", justification='c', font='Mambo 20'),sg.Text("X Y", justification='c', font='Mambo 20', key='-R-')],
+col1 = [[sg.Text("Robot Pos:", justification='c', font='Mambo 20'),sg.Text("X Y", justification='c', font='Mambo 20', key='-R-')],
     [sg.Text("Distance goal:", justification='c', font='Mambo 20'),sg.Text("dist", justification='c', font='Mambo 20', key='-G-')],
     [sg.Text("Velocity:", justification='c', font='Mambo 20'),sg.Text("vel", justification='c', font='Mambo 20', key='-V-')],
     [sg.Text("Angular Velocity:", justification='c', font='Mambo 20'),sg.Text("vel", justification='c', font='Mambo 20', key='-AV-')],
@@ -236,10 +231,15 @@ col1 = [[sg.Button('spawn robot',size=(10,1)),sg.Button('clear',size = (10,1)),s
     [sg.Text("New X position:", justification='c', font='Mambo 20'),sg.Text("new X", justification='c', font='Mambo 20', key='-NX-')],
     [sg.Text("New Y position:", justification='c', font='Mambo 20'),sg.Text("new Y", justification='c', font='Mambo 20', key='-NY-')],
     [sg.Text("Theta:", justification='c', font='Mambo 20'),sg.Text("theta", justification='c', font='Mambo 20', key='-TH-')]]
-col2 = [[sg.Canvas(key='test_env')] ]
+col2 = [[sg.Canvas(key='test_env')]]
+
+col3 = [[sg.Button('spawn robot',size=(10,1))],[sg.Button('clear',size = (10,1))],[sg.Button('G2G',size=(10,1))],
+    [sg.Text('X:'), sg.Input(key='XINPUT',size=(2,1)), sg.Text('Y:'),sg.Input(key='YINPUT',size=(2,1))],
+    [sg.Button('Set goal',size = (10,1))], [sg.Button('remove goal',size = (10,1))],
+    [sg.Button('U',size=(2,1)), sg.Button('D',size=(2,1)), sg.Button('L',size=(2,1)),sg.Button('R',size=(2,1))]]
 
 layout = [
-   [sg.Column(col1, element_justification = 'l'), sg.Column(col2, element_justification = 'c')]
+   [sg.Column(col1, element_justification = 'l'), sg.Column(col2, element_justification = 'c'), sg.Column(col3, element_justification = 'c')]
 ]
 
 
@@ -247,7 +247,7 @@ window = sg.Window(
     'robot navigation',
     layout,
     resizable = True,
-    size=(800,600),
+    size=(1920,1080),
     auto_size_buttons=False,
     location=(100,100),
     finalize=True,
@@ -387,4 +387,3 @@ while True:
         
 
 window.close()
-

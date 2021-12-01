@@ -1,6 +1,6 @@
 from setuptools import setup
 
-package_name = 'startnav'
+package_name = 'nmvr'
 
 setup(
     name=package_name,
@@ -20,7 +20,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'zadanie = startnav.zadanie:main'
+            'startnav = nmvr.startnav:main'
         ],
     },
 )

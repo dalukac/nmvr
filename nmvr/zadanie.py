@@ -23,7 +23,7 @@ norm = colors.BoundaryNorm(bounds,cmap.N)
 
 #load map
 file = "map2.csv"
-data = genfromtxt("map2.csv", delimiter=",")
+data = genfromtxt("/home/nmvr/dev_ws/src/startnav/startnav/map2.csv", delimiter=",")
 matplotlib.use("TkAgg")
 
 #create/destroy robot/goal/obstacles
@@ -387,4 +387,3 @@ while True:
         
 
 window.close()
-
