@@ -1,3 +1,4 @@
+
 import time
 import math
 import matplotlib
@@ -381,9 +382,7 @@ while True:
             delete_fig_agg(fig_agg)
         fig = fig_maker(data)
         fig_agg = draw_figure(window['test_env'].TKCanvas,fig)
-
-    
-
-        
+      
 
 window.close()
+
