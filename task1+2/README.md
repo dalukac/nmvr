@@ -1,4 +1,4 @@
-# nmvr
-Zadanie z predmetu Navigacne metody v robotike ZS2021
 
-test commit
+# Zadanie z predmetu Navigacne metody v robotike ZS2021
+
+Daniel Lukac
